@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SAI Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080a0c;--surface:#0f1114;--surface2:#161a1f;--surface3:#1d2229;--border:#252b33;--border2:#2f3740;--accent:#e87c3a;--accent2:#d06828;--accent-dim:rgba(232,124,58,0.1);--text:#dde2ea;--text-muted:#6b7585;--text-dim:#3d4755;--green:#4caf7d;--red:#e05555;--blue:#5b9bd9}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:13px 26px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:9px}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff}
+.logo-text{font-size:15px;font-weight:700;letter-spacing:-.3px}
+.admin-badge{background:var(--accent-dim);border:1px solid rgba(232,124,58,.2);color:var(--accent);font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.6px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.hright{display:flex;align-items:center;gap:8px}
+.btn{padding:7px 13px;border-radius:8px;font-family:'Sora',sans-serif;font-size:12.5px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.btn-ghost{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--border);color:var(--text)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{box-shadow:0 3px 14px rgba(232,124,58,.3)}
+.btn-danger{background:rgba(224,85,85,.1);color:var(--red);border:1px solid rgba(224,85,85,.2)}
+.btn-danger:hover{background:rgba(224,85,85,.2)}
+.btn-sm{padding:4px 10px;font-size:11.5px;border-radius:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.page{max-width:1200px;margin:0 auto;padding:26px 22px;display:flex;flex-direction:column;gap:20px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px 18px;transition:transform .15s}
+.stat:hover{transform:translateY(-1px)}
+.stat-lbl{font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px}
+.stat-val{font-size:26px;font-weight:700;letter-spacing:-1px;font-family:'JetBrains Mono',monospace}
+.stat-sub{font-size:11px;color:var(--text-dim);margin-top:3px}
+.stat.accent{border-color:rgba(232,124,58,.25);background:linear-gradient(135deg,rgba(232,124,58,.05),var(--surface))}
+.section{background:var(--surface);border:1px solid var(--border);border-radius:15px;overflow:hidden}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.sec-title{font-size:13.5px;font-weight:600}
+.sec-acts{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.filter-tabs{display:flex;gap:3px}
+.ftab{padding:4px 11px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;font-family:'Sora',sans-serif;color:var(--text-muted);background:none;transition:all .15s}
+.ftab:hover{background:var(--surface2);color:var(--text)}
+.ftab.active{background:var(--accent-dim);color:var(--accent);border-color:rgba(232,124,58,.2)}
+.search{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 11px;color:var(--text);font-family:'Sora',sans-serif;font-size:12.5px;outline:none;width:210px;transition:border-color .15s}
+.search:focus{border-color:var(--accent)}
+.search::placeholder{color:var(--text-dim)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:var(--surface2)}
+th{padding:9px 15px;text-align:left;font-size:10.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;cursor:pointer;user-select:none;transition:color .15s}
+th:hover{color:var(--text)}
+td{padding:11px 15px;font-size:13px;border-top:1px solid var(--border);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.012)}
+.ucell{display:flex;align-items:center;gap:9px}
+.uav{width:28px;height:28px;border-radius:7px;background:var(--surface3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent);flex-shrink:0}
+.uemail{font-size:12.5px;font-weight:500}
+.uid{font-size:10.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
+.uname{font-size:11px;color:var(--text-muted);margin-top:1px}
+.tier-sel{background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:5px 8px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;outline:none;cursor:pointer;transition:all .15s}
+.tier-sel:focus{border-color:var(--accent)}
+.acell{display:flex;gap:5px;align-items:center}
+.empty{padding:40px;text-align:center;color:var(--text-muted);font-size:13px}
+.loading{padding:40px;text-align:center;color:var(--text-muted);font-size:13px;display:flex;align-items:center;justify-content:center;gap:10px}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px}
+.footer-info{padding:10px 16px;font-size:11.5px;color:var(--text-dim);border-top:1px solid var(--border)}
+/* Modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:100;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:460px;max-width:92vw;max-height:90vh;overflow-y:auto;animation:mIn .2s ease;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+.modal-lg{width:560px}
+@keyframes mIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:1}
+.mhdr h2{font-size:14.5px;font-weight:600}
+.mbody{padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.mftr{padding:12px 20px 18px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid var(--border)}
+.fl{display:block;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fi{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--text);font-family:'Sora',sans-serif;font-size:13px;outline:none;transition:border-color .15s}
+.fi:focus{border-color:var(--accent)}
+textarea.fi{resize:vertical;min-height:100px;line-height:1.6}
+.icon-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;padding:5px;border-radius:6px;display:flex;align-items:center;font-size:16px;line-height:1;transition:all .15s}
+.icon-btn:hover{background:var(--surface2);color:var(--text)}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+.detail-row:last-child{border-bottom:none}
+.detail-label{font-size:12px;color:var(--text-muted)}
+.detail-value{font-size:13px;font-weight:500}
+.target-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.target-card{border:2px solid var(--border);border-radius:9px;padding:11px;cursor:pointer;text-align:center;font-size:12.5px;transition:all .15s}
+.target-card:hover{border-color:var(--border2);background:var(--surface2)}
+.target-card.active{border-color:var(--accent);background:var(--accent-dim)}
+.target-card .t-icon{font-size:20px;margin-bottom:5px}
+.info-box{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-size:12px;color:var(--text-muted);line-height:1.5}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:12.5px;z-index:999;animation:mIn .2s ease;box-shadow:0 8px 30px rgba(0,0,0,.5);transition:opacity .3s}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">S</div>
+    <span class="logo-text">SAI</span>
+    <span class="admin-badge">Admin</span>
+    <span class="live-dot" title="Live — refreshes every 30s"></span>
+  </div>
+  <div class="hright">
+    <button class="btn btn-ghost btn-sm" onclick="openModal('email-modal')">📧 Broadcast</button>
+    <a href="/" style="text-decoration:none"><button class="btn btn-ghost">← SAI</button></a>
+    <button class="btn btn-primary" onclick="openModal('add-modal')">+ Add User</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="stats">
+    <div class="stat accent">
+      <div class="stat-lbl">Total Users</div>
+      <div class="stat-val" id="s-total">—</div>
+      <div class="stat-sub" id="s-new">loading...</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Max</div>
+      <div class="stat-val" id="s-max" style="color:var(--accent)">—</div>
+      <div class="stat-sub">subscribers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Pro</div>
+      <div class="stat-val" id="s-pro" style="color:var(--blue)">—</div>
+      <div class="stat-sub">subscribers</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Free</div>
+      <div class="stat-val" id="s-free" style="color:var(--text-muted)">—</div>
+      <div class="stat-sub">users</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Msgs Today</div>
+      <div class="stat-val" id="s-msgs" style="color:var(--green)">—</div>
+      <div class="stat-sub">total sent</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span class="sec-title">Users</span>
+        <div class="filter-tabs">
+          <button class="ftab active" onclick="setFilter('all',this)">All</button>
+          <button class="ftab" onclick="setFilter('free',this)">Free</button>
+          <button class="ftab" onclick="setFilter('pro',this)">Pro</button>
+          <button class="ftab" onclick="setFilter('max',this)">Max</button>
+        </div>
+      </div>
+      <div class="sec-acts">
+        <input class="search" id="search" placeholder="Search email or name..." oninput="render()"/>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">↓ CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="load()">↻</button>
+      </div>
+    </div>
+    <div id="table-container"><div class="loading"><div class="spinner"></div>Loading users...</div></div>
+  </div>
+</div>
+
+<!-- ADD USER -->
+<div class="overlay" id="add-modal">
+  <div class="modal">
+    <div class="mhdr"><h2>Add User</h2><button class="icon-btn" onclick="closeModal('add-modal')">✕</button></div>
+    <div class="mbody">
+      <div><label class="fl">Display Name</label><input class="fi" id="add-name" placeholder="Optional"/></div>
+      <div><label class="fl">Email</label><input class="fi" type="email" id="add-email" placeholder="user@example.com"/></div>
+      <div><label class="fl">Password</label><input class="fi" type="password" id="add-pass" placeholder="Min. 6 characters"/></div>
+      <div><label class="fl">Tier</label><select class="fi" id="add-tier"><option value="free">Free</option><option value="pro">Pro</option><option value="max">Max</option></select></div>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-ghost" onclick="closeModal('add-modal')">Cancel</button>
+      <button class="btn btn-primary" id="add-btn" onclick="addUser()">Create User</button>
+    </div>
+  </div>
+</div>
+
+<!-- USER DETAIL -->
+<div class="overlay" id="detail-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><h2 id="detail-title">User Details</h2><button class="icon-btn" onclick="closeModal('detail-modal')">✕</button></div>
+    <div class="mbody" id="detail-body"></div>
+    <div class="mftr">
+      <button class="btn btn-danger" id="detail-del">Delete User</button>
+      <button class="btn btn-primary" onclick="closeModal('detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- BROADCAST EMAIL -->
+<div class="overlay" id="email-modal">
+  <div class="modal modal-lg">
+    <div class="mhdr"><h2>📧 Broadcast Email</h2><button class="icon-btn" onclick="closeModal('email-modal')">✕</button></div>
+    <div class="mbody">
+      <div>
+        <label class="fl">Send To</label>
+        <div class="target-grid">
+          <div class="target-card active" onclick="selectTarget('all',this)"><div class="t-icon">👥</div>All Users</div>
+          <div class="target-card" onclick="selectTarget('free',this)"><div class="t-icon">🆓</div>Free Users</div>
+          <div class="target-card" onclick="selectTarget('pro',this)"><div class="t-icon">⚡</div>Pro Users</div>
+          <div class="target-card" onclick="selectTarget('max',this)"><div class="t-icon">👑</div>Max Users</div>
+        </div>
+      </div>
+      <div><label class="fl">Subject</label><input class="fi" id="email-subject" placeholder="News from SAI!"/></div>
+      <div><label class="fl">Message (HTML supported)</label><textarea class="fi" id="email-body" rows="5" placeholder="<h2>Hello!</h2><p>Your message...</p>"></textarea></div>
+      <div class="info-box">ℹ️ Only users with email notifications enabled will receive this. Requires SMTP configured in app.py.</div>
+    </div>
+    <div class="mftr">
+      <button class="btn btn-ghost" onclick="closeModal('email-modal')">Cancel</button>
+      <button class="btn btn-primary" id="send-email-btn" onclick="sendBroadcast()">Send Email</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let allUsers = [];
+let currentFilter = 'all';
+let sortField = 'created_at';
+let sortDir = -1;
+let selectedTarget = 'all';
+
+async function load() {
+  try {
+    const [usersRes, statsRes] = await Promise.all([
+      fetch('/api/admin/users'),
+      fetch('/api/admin/stats')
+    ]);
+    if (usersRes.status === 401 || usersRes.status === 403) { window.location.href='/'; return; }
+    if (!usersRes.ok) throw new Error('Failed');
+    const data = await usersRes.json();
+    allUsers = data.users || [];
+    const s = data.stats || {};
+    document.getElementById('s-total').textContent = s.total ?? 0;
+    document.getElementById('s-max').textContent = s.max ?? 0;
+    document.getElementById('s-pro').textContent = s.pro ?? 0;
+    document.getElementById('s-free').textContent = s.free ?? 0;
+    document.getElementById('s-msgs').textContent = s.total_messages_today ?? 0;
+    if (statsRes.ok) {
+      const sd = await statsRes.json();
+      document.getElementById('s-new').textContent = `+${sd.new_today ?? 0} today`;
+    }
+    render();
+  } catch(e) {
+    document.getElementById('table-container').innerHTML = `<div class="empty">⚠ Failed to load. <a href="#" onclick="load()" style="color:var(--accent)">Retry</a></div>`;
+  }
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  render();
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  let users = [...allUsers];
+  if (currentFilter !== 'all') users = users.filter(u => u.tier === currentFilter);
+  if (q) users = users.filter(u => u.email.toLowerCase().includes(q) || (u.display_name||'').toLowerCase().includes(q) || String(u.id).includes(q));
+  users.sort((a,b) => {
+    let av = a[sortField] ?? '', bv = b[sortField] ?? '';
+    if (typeof av === 'string') { av = av.toLowerCase(); bv = bv.toLowerCase(); }
+    return av > bv ? sortDir : av < bv ? -sortDir : 0;
+  });
+
+  if (!users.length) {
+    document.getElementById('table-container').innerHTML = '<div class="empty">No users found</div>';
+    return;
+  }
+
+  const rows = users.map(u => {
+    const joined = new Date(u.created_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    return `<tr>
+      <td><div class="ucell">
+        <div class="uav">${(u.email||'?')[0].toUpperCase()}</div>
+        <div>
+          <div class="uemail">${esc(u.email)}</div>
+          ${u.display_name?`<div class="uname">${esc(u.display_name)}</div>`:''}
+          <div class="uid">#${u.id}</div>
+        </div>
+      </div></td>
+      <td>
+        <select class="tier-sel" onchange="changeTier(${u.id},this)">
+          <option value="free"${u.tier==='free'?' selected':''}>Free</option>
+          <option value="pro"${u.tier==='pro'?' selected':''}>Pro</option>
+          <option value="max"${u.tier==='max'?' selected':''}>Max</option>
+        </select>
+      </td>
+      <td><span class="mono">${u.messages_today}</span></td>
+      <td><span class="mono">${u.total_messages}</span></td>
+      <td style="color:var(--text-muted);font-size:12px;white-space:nowrap">${joined}</td>
+      <td><div class="acell">
+        <button class="btn btn-ghost btn-sm" onclick="viewUser(${u.id})">Details</button>
+        <button class="btn btn-danger btn-sm" onclick="delUser(${u.id},'${esc(u.email)}')">Delete</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('table-container').innerHTML = `
+    <div class="table-wrap"><table>
+      <thead><tr>
+        <th onclick="sort('email')">User ↕</th>
+        <th>Tier</th>
+        <th onclick="sort('messages_today')">Msgs Today ↕</th>
+        <th onclick="sort('total_messages')">Total Msgs ↕</th>
+        <th onclick="sort('created_at')">Joined ↕</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>
+    <div class="footer-info">Showing ${users.length} of ${allUsers.length} users · Auto-refreshes every 30s</div>`;
+}
+
+function esc(t) { return String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function sort(f) { if(sortField===f) sortDir*=-1; else{sortField=f;sortDir=-1;} render(); }
+
+async function changeTier(id, sel) {
+  const tier = sel.value;
+  const prev = [...sel.options].find(o=>o.selected)?.value;
+  sel.disabled = true;
+  try {
+    const res = await fetch(`/api/admin/users/${id}/tier`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tier})});
+    if (res.ok) { const u=allUsers.find(u=>u.id===id); if(u) u.tier=tier; showToast(`✓ Tier → ${tier}`); }
+    else { showToast('⚠ Failed'); await load(); }
+  } catch(e) { showToast('⚠ Error'); await load(); }
+  sel.disabled = false;
+}
+
+async function delUser(id, email) {
+  if (!confirm(`Permanently delete ${email}?\n\nAll chats and messages will be deleted. Cannot be undone.`)) return;
+  try {
+    const res = await fetch(`/api/admin/users/${id}`,{method:'DELETE'});
+    if (res.ok) { showToast('✓ User deleted'); allUsers=allUsers.filter(u=>u.id!==id); render(); closeModal('detail-modal'); }
+    else showToast('⚠ Failed to delete');
+  } catch(e) { showToast('⚠ Network error'); }
+}
+
+function viewUser(id) {
+  const u = allUsers.find(u=>u.id===id);
+  if (!u) return;
+  document.getElementById('detail-title').textContent = u.display_name||u.email;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-row"><span class="detail-label">ID</span><span class="detail-value mono">#${u.id}</span></div>
+    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${esc(u.email)}</span></div>
+    <div class="detail-row"><span class="detail-label">Display Name</span><span class="detail-value">${esc(u.display_name||'—')}</span></div>
+    <div class="detail-row"><span class="detail-label">Current Tier</span><span class="detail-value" style="text-transform:capitalize;font-weight:700;color:var(--accent)">${u.tier}</span></div>
+    <div class="detail-row"><span class="detail-label">Messages Today</span><span class="detail-value mono">${u.messages_today}</span></div>
+    <div class="detail-row"><span class="detail-label">Total Messages</span><span class="detail-value mono">${u.total_messages}</span></div>
+    <div class="detail-row"><span class="detail-label">Stripe Connected</span><span class="detail-value">${u.has_stripe?'✓ Yes':'✗ No'}</span></div>
+    <div class="detail-row"><span class="detail-label">Joined</span><span class="detail-value" style="font-size:12px">${new Date(u.created_at).toLocaleString()}</span></div>
+    <div style="margin-top:16px">
+      <label class="fl">Change Tier</label>
+      <div style="display:flex;gap:8px">
+        ${['free','pro','max'].map(t=>`<button class="btn ${t===u.tier?'btn-primary':'btn-ghost'}" onclick="quickTier(${u.id},'${t}')" style="flex:1">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+      </div>
+    </div>`;
+  document.getElementById('detail-del').onclick = () => delUser(u.id, u.email);
+  openModal('detail-modal');
+}
+
+async function quickTier(id, tier) {
+  const res = await fetch(`/api/admin/users/${id}/tier`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tier})});
+  if (res.ok) { const u=allUsers.find(u=>u.id===id); if(u) u.tier=tier; showToast(`✓ ${tier} applied`); viewUser(id); render(); }
+  else showToast('⚠ Failed');
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+
+async function addUser() {
+  const name=document.getElementById('add-name').value.trim();
+  const email=document.getElementById('add-email').value.trim().toLowerCase();
+  const password=document.getElementById('add-pass').value;
+  const tier=document.getElementById('add-tier').value;
+  if(!email||!password){showToast('⚠ Email and password required');return;}
+  if(password.length<6){showToast('⚠ Password too short');return;}
+  const btn=document.getElementById('add-btn');
+  btn.disabled=true;btn.textContent='Creating...';
+  try{
+    const res=await fetch('/api/admin/users',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,tier,display_name:name})});
+    const data=await res.json();
+    if(data.success){closeModal('add-modal');['add-email','add-pass','add-name'].forEach(id=>document.getElementById(id).value='');showToast(`✓ ${email} created`);await load();}
+    else showToast('⚠ '+(data.error||'Failed'));
+  }catch(e){showToast('⚠ Network error');}
+  btn.disabled=false;btn.textContent='Create User';
+}
+
+function selectTarget(t,el){
+  selectedTarget=t;
+  document.querySelectorAll('.target-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+
+async function sendBroadcast(){
+  const subject=document.getElementById('email-subject').value.trim();
+  const body=document.getElementById('email-body').value.trim();
+  if(!subject||!body){showToast('⚠ Subject and message required');return;}
+  const btn=document.getElementById('send-email-btn');
+  btn.disabled=true;btn.textContent='Sending...';
+  try{
+    const res=await fetch('/api/admin/email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subject,body,target:selectedTarget})});
+    const data=await res.json();
+    if(data.success){closeModal('email-modal');showToast(`✓ Sent to ${data.sent} users`);document.getElementById('email-subject').value='';document.getElementById('email-body').value='';}
+    else showToast('⚠ '+(data.error||'Failed — check SMTP settings'));
+  }catch(e){showToast('⚠ Network error');}
+  btn.disabled=false;btn.textContent='Send Email';
+}
+
+function exportCSV(){
+  if(!allUsers.length){showToast('⚠ No users');return;}
+  const rows=[['ID','Name','Email','Tier','Msgs Today','Total Msgs','Joined']];
+  allUsers.forEach(u=>rows.push([u.id,u.display_name||'',u.email,u.tier,u.messages_today,u.total_messages,u.created_at]));
+  const csv=rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download=`sai_users_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();showToast('✓ CSV exported');
+}
+
+function showToast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',2200);
+  setTimeout(()=>t.remove(),2600);
+}
+
+load();
+setInterval(load,30000);
+</script>
+</body>
+</html>

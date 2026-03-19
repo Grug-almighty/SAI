@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SAI — Pricing</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0c0e;--surface:#13151a;--surface2:#1a1d24;--border:#252b35;--accent:#d97757;--accent2:#c96a45;--text:#e4e8f0;--text-muted:#6b7585;--text-dim:#3d4755;--blue:#5b9bd9}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:50px 20px 80px;background-image:radial-gradient(ellipse at 50% 0%,rgba(217,119,87,.08) 0%,transparent 60%)}
+nav{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto 60px;padding:0 4px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--text)}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff}
+.logo-text{font-size:17px;font-weight:700}
+.nav-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:8px 16px;border-radius:9px;font-family:'Sora',sans-serif;font-size:13px;cursor:pointer;text-decoration:none;transition:all .15s}
+.nav-btn:hover{color:var(--text);background:var(--surface2)}
+.hero{text-align:center;margin-bottom:52px}
+.hero h1{font-size:40px;font-weight:700;letter-spacing:-1.5px;margin-bottom:12px}
+.hero h1 span{background:linear-gradient(135deg,var(--accent),#f0a070);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--text-muted);font-size:16px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:960px;margin:0 auto}
+@media(max-width:720px){.plans{grid-template-columns:1fr}}
+.plan{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:28px 24px;display:flex;flex-direction:column;gap:22px;transition:transform .2s,border-color .2s}
+.plan:hover{transform:translateY(-3px)}
+.plan.featured{border-color:rgba(217,119,87,.4);background:linear-gradient(160deg,rgba(217,119,87,.05),var(--surface));box-shadow:0 0 40px rgba(217,119,87,.08)}
+.plan-badge{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.plan-name{font-size:22px;font-weight:700;letter-spacing:-.5px}
+.plan-price{display:flex;align-items:baseline;gap:3px;margin-top:6px}
+.amount{font-size:42px;font-weight:700;letter-spacing:-2px}
+.period{color:var(--text-muted);font-size:14px}
+.plan-desc{color:var(--text-muted);font-size:13.5px;line-height:1.65;margin-top:8px}
+.features{list-style:none;display:flex;flex-direction:column;gap:9px;flex:1}
+.features li{display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:1.5}
+.features li.off{color:var(--text-muted)}
+.plan-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:13px;border-radius:11px;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;width:100%}
+.plan-btn:hover{background:var(--border)}
+.plan-btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;box-shadow:0 4px 20px rgba(217,119,87,.25)}
+.plan-btn.primary:hover{box-shadow:0 6px 28px rgba(217,119,87,.35);transform:translateY(-1px)}
+.plan-btn.outlined{border-color:var(--accent);color:var(--accent)}
+.plan-btn.outlined:hover{background:rgba(217,119,87,.08)}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><div class="logo-icon">S</div><span class="logo-text">SAI</span></a>
+  <a href="/" class="nav-btn">← Back to SAI</a>
+</nav>
+<div class="hero">
+  <h1>Simple, <span>powerful</span> pricing</h1>
+  <p>Start free. Upgrade when you need more.</p>
+</div>
+<div class="plans">
+  <div class="plan">
+    <div>
+      <div class="plan-name">Free</div>
+      <div class="plan-price"><span class="amount">$0</span><span class="period">/month</span></div>
+      <div class="plan-desc">Perfect for trying SAI and light daily use.</div>
+    </div>
+    <ul class="features">
+      <li><span>✓</span> 20 messages per day</li>
+      <li><span>✓</span> LLaMA 3.1 8B model</li>
+      <li><span>✓</span> Chat history</li>
+      <li><span>✓</span> Voice input</li>
+      <li><span>✓</span> File attachments</li>
+      <li class="off"><span>✗</span> Advanced models</li>
+      <li class="off"><span>✗</span> Image generation</li>
+      <li class="off"><span>✗</span> Unlimited messages</li>
+    </ul>
+    <button class="plan-btn" onclick="choosePlan('free')">Get Started Free</button>
+  </div>
+  <div class="plan featured">
+    <div>
+      <div class="plan-badge">Most Popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price"><span class="amount">$9</span><span class="period">/month</span></div>
+      <div class="plan-desc">For power users who need faster, smarter responses.</div>
+    </div>
+    <ul class="features">
+      <li><span>✓</span> Unlimited messages</li>
+      <li><span>✓</span> LLaMA 8B, Mixtral, LLaMA 70B</li>
+      <li><span>✓</span> Image generation (fal.ai)</li>
+      <li><span>✓</span> Voice input & file uploads</li>
+      <li><span>✓</span> GitHub & Discord integration</li>
+      <li><span>✓</span> Chat export (TXT, MD, JSON)</li>
+      <li><span>✓</span> Custom AI personas</li>
+      <li class="off"><span>✗</span> DeepSeek R1 (Max only)</li>
+    </ul>
+    <button class="plan-btn primary" onclick="choosePlan('pro')">Upgrade to Pro</button>
+  </div>
+  <div class="plan">
+    <div>
+      <div class="plan-name">Max</div>
+      <div class="plan-price"><span class="amount">$19</span><span class="period">/month</span></div>
+      <div class="plan-desc">Maximum power with every model and feature.</div>
+    </div>
+    <ul class="features">
+      <li><span>✓</span> Everything in Pro</li>
+      <li><span>✓</span> DeepSeek R1 70B reasoning</li>
+      <li><span>✓</span> Gmail integration</li>
+      <li><span>✓</span> Priority support</li>
+      <li><span>✓</span> Early access to new features</li>
+      <li><span>✓</span> All service integrations</li>
+    </ul>
+    <button class="plan-btn outlined" onclick="choosePlan('max')">Upgrade to Max</button>
+  </div>
+</div>
+<script>
+async function choosePlan(tier){
+  if(tier==='free'){window.location.href='/login';return}
+  const r=await fetch('/api/me');const u=await r.json();
+  if(!u.authenticated){window.location.href='/login';return}
+  if(u.tier===tier){window.location.href='/';return}
+  const c=await fetch('/api/stripe/checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tier})});
+  const d=await c.json();
+  if(d.url)window.location.href=d.url;
+  else alert(d.error||'Checkout failed');
+}
+</script>
+</body>
+</html>

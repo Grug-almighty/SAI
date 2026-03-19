@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SAI — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0c0e;--surface:#13151a;--surface2:#1a1d24;--border:#252b35;--accent:#d97757;--accent2:#c96a45;--text:#e4e8f0;--text-muted:#6b7585}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background-image:radial-gradient(ellipse at 20% 50%,rgba(217,119,87,.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(91,141,217,.04) 0%,transparent 50%)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:22px;width:420px;max-width:100%;padding:38px 34px;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.logo{display:flex;align-items:center;gap:11px;justify-content:center;margin-bottom:30px}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;box-shadow:0 4px 20px rgba(217,119,87,.3)}
+.logo-text{font-size:24px;font-weight:700;letter-spacing:-.5px}
+.tabs{display:flex;background:var(--surface2);border-radius:11px;padding:4px;margin-bottom:26px;gap:4px}
+.tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-muted);transition:all .15s;border:none;background:none;font-family:'Sora',sans-serif}
+.tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 6px rgba(0,0,0,.4)}
+.field{margin-bottom:15px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--text);font-family:'Sora',sans-serif;font-size:14px;outline:none;transition:border-color .15s}
+.field input:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--text-muted)}
+.btn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:11px;padding:13px;color:#fff;font-family:'Sora',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:6px;box-shadow:0 4px 20px rgba(217,119,87,.25)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(217,119,87,.35)}
+.btn:active{transform:translateY(0)}
+.error{background:rgba(224,85,85,.1);border:1px solid rgba(224,85,85,.25);border-radius:9px;padding:10px 13px;font-size:13px;color:#f87171;margin-bottom:14px;display:none}
+.footer-links{display:flex;justify-content:center;gap:20px;margin-top:22px}
+.footer-links a{color:var(--text-muted);font-size:12.5px;text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo"><div class="logo-icon">S</div><span class="logo-text">SAI</span></div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('login')">Sign In</button>
+    <button class="tab" onclick="switchTab('register')">Create Account</button>
+  </div>
+  <div id="error" class="error"></div>
+  <div id="login-form">
+    <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn" onclick="doLogin()">Sign In →</button>
+  </div>
+  <div id="register-form" style="display:none">
+    <div class="field"><label>Display Name</label><input type="text" id="reg-name" placeholder="Your name"/></div>
+    <div class="field"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com"/></div>
+    <div class="field"><label>Password</label><input type="password" id="reg-pass" placeholder="Min. 6 characters" onkeydown="if(event.key==='Enter')doRegister()"/></div>
+    <button class="btn" onclick="doRegister()">Create Account →</button>
+  </div>
+  <div class="footer-links"><a href="/pricing">View Plans</a><a href="/">Back to SAI</a></div>
+</div>
+<script>
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',(t==='login'?0:1)===i));
+  document.getElementById('login-form').style.display=t==='login'?'block':'none';
+  document.getElementById('register-form').style.display=t==='register'?'block':'none';
+  document.getElementById('error').style.display='none';
+}
+function showErr(m){const e=document.getElementById('error');e.textContent=m;e.style.display='block'}
+async function doLogin(){
+  const email=document.getElementById('login-email').value;
+  const password=document.getElementById('login-pass').value;
+  if(!email||!password){showErr('Please fill in all fields');return}
+  const r=await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+  const d=await r.json();
+  if(d.success)window.location.href='/';else showErr(d.error||'Login failed');
+}
+async function doRegister(){
+  const display_name=document.getElementById('reg-name').value;
+  const email=document.getElementById('reg-email').value;
+  const password=document.getElementById('reg-pass').value;
+  if(!email||!password){showErr('Please fill in all fields');return}
+  const r=await fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,display_name})});
+  const d=await r.json();
+  if(d.success)window.location.href='/';else showErr(d.error||'Registration failed');
+}
+</script>
+</body>
+</html>
